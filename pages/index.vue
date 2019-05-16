@@ -22,6 +22,7 @@
  
           input.inputclass(v-model="text" :placeholder = "placeholder")
           input.send(type="submit" value="SEND" v-on:click="send_text")
+    .hh
 
 </template>
 
@@ -125,6 +126,7 @@ $dark-blue: #263147
   justify-content: center
   align-items: center
   text-align: center
+  flex-direction: column
 
 .line-window
   border-radius: 5px
@@ -375,11 +377,11 @@ $dark-blue: #263147
 
   .container
     overflow: scroll
-    align-items: flex-start
+    justify-content: flex-start
 
 
   .line-window
-      height: 100vh
+      min-height: 100vh
       margin: 10px
       grid-template-columns: 95vw
       grid-template-rows: 50px auto 170px
@@ -394,4 +396,6 @@ $dark-blue: #263147
   input
     -webkit-appearance: none
 
+  .hh
+    min-height: 20px
 </style>
