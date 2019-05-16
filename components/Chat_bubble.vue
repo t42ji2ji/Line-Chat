@@ -1,10 +1,5 @@
 <template lang="pug">
 	section.content#chat-room       
-		div.normal.from-them
-			.icon
-			p Hey!
-			span.time
-
 		//- div.normal.from-them
 		//- 	.icon
 		//- 	p 大家大家
@@ -20,7 +15,7 @@
 <script>
 export default {
 	mounted(){
-		// this.add(true, "qwe", false)
+		this.add(false, "Hey !", false)
 	},
 	methods: {
 		test: function(){
@@ -33,14 +28,17 @@ export default {
 			var icon = document.createElement("DIV")
 			var img = document.createElement("IMG")
 			var time = document.createElement("SPAN")
-
+			var dt = new Date()
 			//set
 			icon.classList.add("icon")
 			p.innerText = text;
 			img.style.width = "150px";
 			img.setAttribute("src", "/sticker/" + sticker_path + ".png")
 			time.classList.add("time")
-
+			let noon = dt.getHours()>12 ? ' 下午' : ' 上午'
+			let timecode =  addZero(dt.getHours()) + ":" + addZero(dt.getMinutes()) + noon
+			console.log(timecode);
+			time.setAttribute('data-text', timecode)
 			div.classList.add("normal")
 			if(isfrom_me){
 				div.classList.add("from-me");
@@ -57,8 +55,13 @@ export default {
 			}
 
 			div.appendChild(time)
-
 			chat.appendChild(div)
+			function addZero(i) {
+				if (i < 10) {
+					i = "0" + i;
+				}
+				return i;
+			}
 		}
 	}
 }
@@ -68,16 +71,18 @@ export default {
 <style>
 
 .from-me > .time:after{
-	content:"94:38 下午";
+	content: attr(data-text);
 	position: absolute;
 	left: -85px;
 	bottom: 0px;
 	font-size: 1rem;
 	font-weight: bold;	
+	color: white;
+
 }
 
 .from-them > .time:after{
-	content:"04:38 下午";
+	content:attr(data-text);
 	position: absolute;
 	right: -85px;
 	bottom: 0px;
@@ -133,15 +138,13 @@ export default {
   }
 
 .from-me {
-	color:white; 
-	background:#0B93F6;
+	background:#89e443;
 	align-self: flex-end;
 }
 
 .from-me:before {
 		right:-9px;
-    background: yellow;
-		border-right:19px solid #0B93F6;
+		border-right:19px solid #89e443;
 		border-bottom-right-radius: 16px 14px;
 		-webkit-transform:translate(0, -2px);
 		transform:translate(0, -2px);

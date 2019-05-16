@@ -239,7 +239,7 @@ $dark-blue: #263147
       margin-left: 15px
       height: 60%
       width: 20%
-      background-color: $light-blue
+      background-color: $dark-blue
       cursor: pointer
         
 .stickers_wraper
