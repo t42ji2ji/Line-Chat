@@ -1,0 +1,25 @@
+{
+  "name": "chatroom",
+  "version": "1.0.0",
+  "description": "My good Nuxt.js project",
+  "author": "DORA_XIE",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "heroku-postbuild": "npm run build"
+  },
+  "dependencies": {
+    "cross-env": "^5.2.0",
+    "nuxt": "^2.4.0"
+  },
+  "devDependencies": {
+    "node-sass": "^4.12.0",
+    "nodemon": "^1.18.9",
+    "pug": "^2.0.3",
+    "pug-plain-loader": "^1.0.0",
+    "sass-loader": "^7.1.0"
+  }
+}
