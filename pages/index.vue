@@ -360,7 +360,6 @@ $dark-blue: #263147
   position: relative
   .slider
     height: 100%
-    width: 100%
     display: flex
     transition: .3s
     // &::-webkit-scrollbar
