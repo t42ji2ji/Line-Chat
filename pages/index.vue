@@ -1,7 +1,8 @@
 <template lang="pug">
   section.container
     .line-window
-      .head(v-on:click="snapshot") 金水
+      .head 金水
+        .download(v-on:click="snapshot") 下載
         .options(v-if="isopen_option")
       .chat-content(v-on:scroll="watch")
         Chat_bubble(ref="childTest")
@@ -29,7 +30,7 @@
     .show_window(v-show="isshow_window" v-on:click="()=>{ this.isshow_window = !this.isshow_window}")
       //- .load loading
       img.screenshot
-    .testbtn(v-on:click="test") asdasdasd
+    //- .testbtn(v-on:click="test") asdasdasd
       
 
 </template>
@@ -93,24 +94,37 @@ export default {
       console.log(event.target.scrollTop, event.target.scrollHeight);
     },
     test: function() {
-      if (this.isopen_sticker) 
-        this.open_sticker();
-      console.log("test");
-      let container = this.$el.querySelector(".chat-content");
-      container.style.overflowY = "hidden";
-      console.log(
-        (this.scroll_var[0] * this.scroll_var[0]) / this.scroll_var[1]
-      );
+      // if (this.isopen_sticker)
+      //   this.open_sticker();
+      // console.log("test");
+      // let container = this.$el.querySelector(".chat-content");
+      // container.style.overflowY = "hidden";
+      // console.log(
+      //   (this.scroll_var[0] * this.scroll_var[0]) / this.scroll_var[1]
+      // );
       // container.childNodes[0].style.transform = "translateY(200px)"
     },
     snapshot: function() {
+      
+      if (this.isopen_sticker) {
+        this.open_sticker();
+      }
+      let container = this.$el.querySelector(".chat-content");
+      container.style.overflowY = "hidden";
+
       let screnshot = this.$el.querySelector(".screenshot");
       this.isshow_window = !this.isshow_window;
       let node = this.$el.querySelector(".line-window");
+      let input = this.$el.querySelector(".inputclass")
+      input.setAttribute("placeholder", "")
+      screnshot.src = "/LOADING.png";
+
       domtoimage
-        .toPng(node, {scrollFix: true})
+        .toPng(node, { scrollFix: true })
         .then(function(dataUrl) {
           screnshot.src = dataUrl;
+          container.style.overflowY = "scroll";
+
         })
         .catch(function(error) {
           console.error("oops, something went wrong!", error);
@@ -180,7 +194,6 @@ export default {
       let gridupdate = this.$el.querySelector(".line-window");
       let arrow = this.$el.querySelector(".arrow_wrapper");
 
-
       if (this.isopen_sticker) {
         gridupdate.style.gridTemplateRows = "70px auto 320px";
         this.$el.querySelectorAll(".state_icon")[2].style.filter =
@@ -217,6 +230,7 @@ $dark-blue: #263147
   flex-direction: column
 
 .line-window
+  position: relative
   border-radius: 5px
   height: 850px
   background-color: $light-blue
@@ -392,6 +406,12 @@ $dark-blue: #263147
     font-size: 3rem
 
 
+.download
+  position: absolute
+  right: 15px
+  top: 0px
+  font-size: 1rem
+  color: rgba(white, .7)
 
 
 
@@ -457,7 +477,7 @@ $dark-blue: #263147
   75%
     -webkit-transform: translateY(-6px) rotate(-1.2deg)
     transform: translateY(-6px) rotate(-1.2deg)
-    
+
 
 
 .v-leave
@@ -503,20 +523,26 @@ $dark-blue: #263147
   .container
     overflow: scroll
     justify-content: flex-start
-
+    max-height: 100vh
+    width: 100vw
+  .screenshot
+    width: 70%
 
   .line-window
-      min-height: 100vh
-      margin: 10px
-      grid-template-columns: 95vw
+      width: 90%
+      margin-top: 10px
+      grid-template-columns: 100%
       grid-template-rows: 50px auto 170px
 
   .head
     line-height: 50px
 
+  .inputclass
+    width: 65% !important
+
   .send
     border-radius: 0px
-    font-size: 1rem !important
+    font-size: .8rem !important
 
   input
     -webkit-appearance: none
