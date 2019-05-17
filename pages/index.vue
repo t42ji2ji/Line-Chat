@@ -85,10 +85,14 @@ export default {
           this.stick_slide_btn(false);
         } else if (event.keyCode == 39 && this.isopen_sticker) {
           this.stick_slide_btn(true);
+        } else if (event.keyCode == 13) {
+          this.send_text();
         }
       });
     },
     watch: function(event) {
+      // event.preventDefault();
+
       this.scroll_var[0] = event.target.scrollTop;
       this.scroll_var[1] = event.target.scrollHeight;
       console.log(event.target.scrollTop, event.target.scrollHeight);
@@ -105,7 +109,6 @@ export default {
       // container.childNodes[0].style.transform = "translateY(200px)"
     },
     snapshot: function() {
-      
       if (this.isopen_sticker) {
         this.open_sticker();
       }
@@ -115,8 +118,8 @@ export default {
       let screnshot = this.$el.querySelector(".screenshot");
       this.isshow_window = !this.isshow_window;
       let node = this.$el.querySelector(".line-window");
-      let input = this.$el.querySelector(".inputclass")
-      input.setAttribute("placeholder", "")
+      let input = this.$el.querySelector(".inputclass");
+      input.setAttribute("placeholder", "");
       screnshot.src = "/LOADING.png";
 
       domtoimage
@@ -124,7 +127,6 @@ export default {
         .then(function(dataUrl) {
           screnshot.src = dataUrl;
           container.style.overflowY = "scroll";
-
         })
         .catch(function(error) {
           console.error("oops, something went wrong!", error);
@@ -182,12 +184,15 @@ export default {
       message.add(!this.isdog_speak, this.text, false);
       this.text = "";
       this.scroll_down();
-      return false;
     },
     send_img: function(png) {
+      let vm = this
       let message = this.$refs.childTest;
       message.add(!this.isdog_speak, "", true, png);
-      this.scroll_down();
+      // setTimeout(function() {
+      //   vm.scroll_down();
+      // }, 100);
+      this.scroll_down()
     },
     open_sticker: function() {
       this.isopen_sticker = !this.isopen_sticker;
@@ -261,6 +266,7 @@ $dark-blue: #263147
 
 
 .chat-content
+  -webkit-overflow-scrolling: touch
   overflow-y: scroll
   overflow-x: hidden
   width: 100%
@@ -501,7 +507,7 @@ $dark-blue: #263147
   border-width: 0 5px 5px 0
   display: inline-block
   padding: 5px
-  margin-left: 50px
+  margin-left: 40px
   border-radius: 3px
 
 
@@ -527,6 +533,14 @@ $dark-blue: #263147
     width: 100vw
   .screenshot
     width: 70%
+
+  .dot
+    display: none
+  .arrow
+    display: none
+
+  .slider
+    overflow-y: scroll    
 
   .line-window
       width: 90%
