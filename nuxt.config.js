@@ -15,11 +15,11 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/ff.ico' },
-      { rel: 'stylesheet', href: '/onepage/onepage-scroll.css' }
+      { rel: 'stylesheet', href: '/Glider/glider.min.css' }
 
     ],
     script: [
-      { src: '/onepage/onepage-scroll.js'}
+      { src: '/domtoimage.js'}
     ]
   },
 

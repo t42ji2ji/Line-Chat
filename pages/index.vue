@@ -1,34 +1,42 @@
 <template lang="pug">
   section.container
     .line-window
-      .head 金水
+      .head(v-on:click="snapshot") 金水
         .options(v-if="isopen_option")
-      .chat-content
+      .chat-content(v-on:scroll="watch")
         Chat_bubble(ref="childTest")
       .input-content
-        .stickers_wraper(v-if="isopen_sticker")
+        .stickers_wraper(v-show="isopen_sticker")
           .slider
             section.slide(v-for="s in 10")
               .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
-          .dots
-            .dot(v-for="n in 10" v-on:click="stick_slide(n)")
+          .dots(key="dot")
+            .dot(v-for="n in 10" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
             //- .stick(v-for="stick in stickers") {{stick}}
         .state_controller
           .state_icon.state_hover(style="background-image: url('/dog-face.png')" v-on:click="speak(true)")
           .state_icon.state_hover(style="background-image: url('/cat-face.png')" v-on:click="speak(false)")
           .gap
           .state_icon(style="background-image: url('/tab.png')" v-on:click="open_sticker")
+          .arrow_wrapper
+            i.arrow.left(v-on:click="stick_slide_btn(false)")
+            i.arrow.right(v-on:click="stick_slide_btn(true)")
+
         .inp
- 
           input.inputclass(v-model="text" :placeholder = "placeholder")
           input.send(type="submit" value="SEND" v-on:click="send_text")
     .hh
+    .show_window(v-show="isshow_window" v-on:click="()=>{ this.isshow_window = !this.isshow_window}")
+      //- .load loading
+      img.screenshot
+    .testbtn(v-on:click="test") asdasdasd
+      
 
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import Chat_bubble from '~/components/Chat_bubble.vue'
+import Logo from "~/components/Logo.vue";
+import Chat_bubble from "~/components/Chat_bubble.vue";
 
 export default {
   components: {
@@ -38,78 +46,158 @@ export default {
   data() {
     return {
       text: "",
+      isshow_window: false,
       isopen_option: false,
       isopen_sticker: false,
       isdog_speak: false,
       placeholder: "現在是我在說話!!",
-      stickers: [0,0,0,0,0,0]
+      last_dot: null,
+      now_slide: 1,
+      scroll_var: [0, 0]
+    };
+  },
+  computed: {
+    slide_to() {
+      var now = 1;
+      if (this.now_slide > 10) {
+        this.now_slide = 1;
+        now = 1;
+      } else if (this.now_slide < 1) {
+        this.now_slide = 10;
+        now = 10;
+      } else now = this.now_slide;
+      return now;
     }
   },
   mounted() {
-    this.$el.querySelectorAll(".state_icon")[1].style.filter = "grayscale(0%)"
-    this.setPage_scroll()
+    this.$el.querySelectorAll(".state_icon")[1].style.filter = "grayscale(0%)";
+    let dot = this.$el.querySelector(".dot");
+    dot.style.backgroundColor = "#263147";
+    this.last_dot = dot;
+
+    this.keylistener();
   },
   methods: {
-    stick_slide: function(n){
-      let slider = this.$el.querySelector(".slider")
-      let scrollto = slider.offsetWidth*(n-1) + "px"
-      slider.style.transform = `translateX(-${scrollto})`
+    keylistener: function() {
+      document.addEventListener("keydown", event => {
+        if (event.keyCode == 37 && this.isopen_sticker) {
+          this.stick_slide_btn(false);
+        } else if (event.keyCode == 39 && this.isopen_sticker) {
+          this.stick_slide_btn(true);
+        }
+      });
     },
-    setPage_scroll: function(){
+    watch: function(event) {
+      this.scroll_var[0] = event.target.scrollTop;
+      this.scroll_var[1] = event.target.scrollHeight;
+      console.log(event.target.scrollTop, event.target.scrollHeight);
+    },
+    test: function() {
+      if (this.isopen_sticker) 
+        this.open_sticker();
+      console.log("test");
+      let container = this.$el.querySelector(".chat-content");
+      container.style.overflowY = "hidden";
+      console.log(
+        (this.scroll_var[0] * this.scroll_var[0]) / this.scroll_var[1]
+      );
+      // container.childNodes[0].style.transform = "translateY(200px)"
+    },
+    snapshot: function() {
+      let screnshot = this.$el.querySelector(".screenshot");
+      this.isshow_window = !this.isshow_window;
+      let node = this.$el.querySelector(".line-window");
+      domtoimage
+        .toPng(node, {scrollFix: true})
+        .then(function(dataUrl) {
+          screnshot.src = dataUrl;
+        })
+        .catch(function(error) {
+          console.error("oops, something went wrong!", error);
+        });
+    },
+    stick_slide: function(n) {
+      this.now_slide = n;
+      console.log(this.slide_to, this.now_slide);
+      let slider = this.$el.querySelector(".slider");
+      let scrollto = slider.offsetWidth * (this.slide_to - 1) + "px";
+      slider.style.transform = `translateX(-${scrollto})`;
 
+      if (this.last_dot) {
+        this.last_dot.style.backgroundColor = "lightgray";
+      }
+      let dot = this.$el.querySelector(`#dot_${this.slide_to}`);
+      dot.style.backgroundColor = "#263147";
+      this.last_dot = dot;
     },
-    speak: function(isdog_speak){
-      let item = this.$el.querySelectorAll(".state_icon")
-      if(isdog_speak){
-        this.placeholder = "現在是金水在說話!!"
-        this.isdog_speak = isdog_speak
-        item[0].style.filter = "grayscale(0%)"
-        item[0].classList.add("wobble-hor-bottom")
-        item[1].style.filter = "grayscale(100%)"
-        item[1].classList.remove("wobble-hor-bottom")
-        this.isdog_speak = isdog_speak
+    stick_slide_btn: function(is_next) {
+      if (is_next) {
+        this.now_slide += 1;
+        this.stick_slide(this.now_slide);
       } else {
-        this.placeholder = "現在是我在說話!!"
-        this.isdog_speak = isdog_speak
-        item[1].style.filter = "grayscale(0%)"
-        item[1].classList.add("wobble-hor-bottom")
-        item[0].classList.remove("wobble-hor-bottom")
-        item[0].style.filter = "grayscale(100%)"
-        this.isdog_speak = isdog_speak
+        this.now_slide -= 1;
+        this.stick_slide(this.now_slide);
       }
     },
-    scroll_down: function(){
-      let container = this.$el.querySelector(".chat-content")
-      container.scrollTop = container.scrollHeight
+    speak: function(isdog_speak) {
+      let item = this.$el.querySelectorAll(".state_icon");
+      if (isdog_speak) {
+        this.placeholder = "現在是金水在說話!!";
+        this.isdog_speak = isdog_speak;
+        item[0].style.filter = "grayscale(0%)";
+        item[0].classList.add("wobble-hor-bottom");
+        item[1].style.filter = "grayscale(100%)";
+        item[1].classList.remove("wobble-hor-bottom");
+        this.isdog_speak = isdog_speak;
+      } else {
+        this.placeholder = "現在是我在說話!!";
+        this.isdog_speak = isdog_speak;
+        item[1].style.filter = "grayscale(0%)";
+        item[1].classList.add("wobble-hor-bottom");
+        item[0].classList.remove("wobble-hor-bottom");
+        item[0].style.filter = "grayscale(100%)";
+        this.isdog_speak = isdog_speak;
+      }
     },
-    send_text: function(event){
-      let message = this.$refs.childTest
-      message.add(!this.isdog_speak, this.text, false)
-      this.text = ""
-      this.scroll_down()
-      return false
+    scroll_down: function() {
+      let container = this.$el.querySelector(".chat-content");
+      container.scrollTop = container.scrollHeight;
+    },
+    send_text: function(event) {
+      let message = this.$refs.childTest;
+      message.add(!this.isdog_speak, this.text, false);
+      this.text = "";
+      this.scroll_down();
+      return false;
     },
     send_img: function(png) {
-      let message = this.$refs.childTest
-      message.add(!this.isdog_speak, "", true, png)
-      this.scroll_down()
-
+      let message = this.$refs.childTest;
+      message.add(!this.isdog_speak, "", true, png);
+      this.scroll_down();
     },
-    open_sticker: function(){
-      this.isopen_sticker = !this.isopen_sticker
-      let gridupdate = this.$el.querySelector(".line-window")
-      if(this.isopen_sticker){
-        gridupdate.style.gridTemplateRows = "70px auto 320px"
-        this.$el.querySelectorAll(".state_icon")[2].style.filter = "grayscale(0%)"
-      } else {
-        gridupdate.style.gridTemplateRows = "70px auto 170px"
-        this.$el.querySelectorAll(".state_icon")[2].style.filter = "grayscale(100%)"
-      }
-      this.scroll_down()
+    open_sticker: function() {
+      this.isopen_sticker = !this.isopen_sticker;
+      let gridupdate = this.$el.querySelector(".line-window");
+      let arrow = this.$el.querySelector(".arrow_wrapper");
 
+
+      if (this.isopen_sticker) {
+        gridupdate.style.gridTemplateRows = "70px auto 320px";
+        this.$el.querySelectorAll(".state_icon")[2].style.filter =
+          "grayscale(0%)";
+        arrow.style.opacity = 1;
+        arrow.style.transform = "translateY(0px)";
+      } else {
+        gridupdate.style.gridTemplateRows = "70px auto 170px";
+        this.$el.querySelectorAll(".state_icon")[2].style.filter =
+          "grayscale(100%)";
+        arrow.style.opacity = 0;
+        arrow.style.transform = "translateY(15px)";
+        arrow.classList.remove("arrow_wrapper_effect");
+      }
     }
   }
-}
+};
 </script>
 
 <style lang="sass">
@@ -288,6 +376,20 @@ $dark-blue: #263147
       background-color: lightgray
       border-radius: 5px
 
+.show_window
+  width: 100vw
+  height: 100vh
+  background-color: rgba(black, .7)
+  position: absolute
+  z-index: 999
+  display: flex
+  justify-content: center
+  align-items: center
+
+  .load
+    color: white
+    position: absolute
+    font-size: 3rem
 
 
 
@@ -372,7 +474,30 @@ $dark-blue: #263147
 .v-enter-to
   opacity: 1
 
+// arrow
+.arrow
+  cursor: pointer
+  border: solid black
+  border-width: 0 5px 5px 0
+  display: inline-block
+  padding: 5px
+  margin-left: 50px
+  border-radius: 3px
 
+
+.arrow_wrapper
+  opacity: 0 
+  transform: translateY(15px)
+  transition: .5s
+
+.right
+  transform: rotate(-45deg)
+  -webkit-transform: rotate(-45deg)
+  
+
+.left
+  transform: rotate(135deg)
+  -webkit-transform: rotate(135deg)
 @media screen and (max-width: 600px)
 
   .container

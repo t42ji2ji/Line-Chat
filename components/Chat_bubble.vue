@@ -33,11 +33,10 @@ export default {
 			icon.classList.add("icon")
 			p.innerText = text;
 			img.style.width = "150px";
-			img.setAttribute("src", "/sticker/" + sticker_path + ".png")
+			
 			time.classList.add("time")
 			let noon = dt.getHours()>12 ? ' 下午' : ' 上午'
 			let timecode =  addZero(dt.getHours()) + ":" + addZero(dt.getMinutes()) + noon
-			console.log(timecode);
 			time.setAttribute('data-text', timecode)
 			div.classList.add("normal")
 			if(isfrom_me){
@@ -48,6 +47,7 @@ export default {
 			}
 
 			if(issticker){
+				img.setAttribute("src", "/sticker/" + sticker_path + ".png")
 				div.classList.add("sticker")
 				div.appendChild(img)
 			} else {
