@@ -266,7 +266,7 @@ $dark-blue: #263147
 
 
 .chat-content
-  -webkit-overflow-scrolling: touch
+  overflow-scrolling: touch
   overflow-y: scroll
   overflow-x: hidden
   width: 100%
