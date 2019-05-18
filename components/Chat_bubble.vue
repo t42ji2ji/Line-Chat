@@ -21,6 +21,10 @@ export default {
 		test: function(){
 			console.log("child olg");
 		},
+		clean: function() {
+			let chat = document.getElementById("chat-room")
+			chat.innerHTML = ""
+		},
 		add: function(isfrom_me, text, issticker, sticker_path = ""){
 			let chat = document.getElementById("chat-room")
 			var div = document.createElement("DIV");
@@ -36,7 +40,7 @@ export default {
 			
 			time.classList.add("time")
 			let noon = dt.getHours()>12 ? ' 下午' : ' 上午'
-			let timecode =  addZero(dt.getHours()) + ":" + addZero(dt.getMinutes()) + noon
+			let timecode =  addZero(dt.getHours()>12?dt.getHours()-12:dt.getHours()) + ":" + addZero(dt.getMinutes()) + noon
 			time.setAttribute('data-text', timecode)
 			div.classList.add("normal")
 			if(isfrom_me){

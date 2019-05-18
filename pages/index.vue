@@ -1,9 +1,18 @@
 <template lang="pug">
   section.container
     .line-window
-      .head 金水
-        .download(v-on:click="snapshot") 下載
+      .head(v-on:click="open_options") 金水
+        .download
         .options(v-if="isopen_option")
+          .down_btn.op_item(v-on:click="snapshot")
+            img(src="/down.png")
+            span 下載
+          .op_item
+            img.up_btn(src="/down.png")
+            span 上傳
+          .op_item(v-on:click="clean")
+            img(src="/name.png")
+            span 改名
       .chat-content(v-on:scroll="watch")
         Chat_bubble(ref="childTest")
       .input-content
@@ -79,6 +88,20 @@ export default {
     this.keylistener();
   },
   methods: {
+    clean: function(){
+      let message = this.$refs.childTest;
+      message.clean()
+    },
+    open_options: function(){
+      this.isopen_option = !this.isopen_option
+      let nav = this.$el.querySelector(".download")
+      console.log(nav);
+      if(this.isopen_option){
+        nav.style.transform = "rotate(180deg)"
+      } else {
+        nav.style.transform = "rotate(0deg)"
+      }
+    },
     keylistener: function() {
       document.addEventListener("keydown", event => {
         if (event.keyCode == 37 && this.isopen_sticker) {
@@ -111,6 +134,9 @@ export default {
     snapshot: function() {
       if (this.isopen_sticker) {
         this.open_sticker();
+      }
+      if (this.isopen_option) {
+        this.open_options()
       }
       let container = this.$el.querySelector(".chat-content");
       container.style.overflowY = "hidden";
@@ -256,14 +282,32 @@ $dark-blue: #263147
   z-index: 100
   text-align: center
   vertical-align: middle
+  position: relative
   .options
     width: 100%
     height: 100px
     background-color: $dark-blue
     border-top: 2px solid #1b2333
+    display: flex
+    flex-direction: row
+    justify-content: space-around
+    align-items: center
 
-
-
+    .op_item
+      flex: 1
+      height: 80%
+      margin: 5px
+      display: flex
+      justify-content: center
+      align-items: center
+      flex-direction: column
+      cursor: pointer
+      .up_btn
+        transform: rotate(180deg)
+      span
+        margin-top: -5px
+        height: 50%
+        font-size: 1rem
 
 .chat-content
   overflow-y: scroll
@@ -314,7 +358,7 @@ $dark-blue: #263147
     .state_hover
       &:hover
         filter: grayscale(0%)
-        transform: scale(1.8)
+        transform: scale(1.4)
     
     .gap
       margin-left: 20px
@@ -414,9 +458,25 @@ $dark-blue: #263147
 .download
   position: absolute
   right: 15px
-  top: 0px
-  font-size: 1rem
-  color: rgba(white, .7)
+  top: 45%
+  width: 2rem
+  height: 4px
+  background-color: white
+  border-radius: 5px
+  transition: .4s
+  &:before, &:after
+    content: ""
+    position: absolute
+    width: 2rem
+    height: 4px
+    background-color: white
+    left: 0
+    border-radius: 5px
+  &:before
+      top: 10px
+  &:after
+      top: -10px
+
 
 
 
