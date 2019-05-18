@@ -269,6 +269,7 @@ $dark-blue: #263147
   overflow-y: scroll
   overflow-x: hidden
   width: 100%
+  -webkit-overflow-scrolling: touch
 
   &::-webkit-scrollbar
     width: 8px
@@ -423,8 +424,11 @@ $dark-blue: #263147
 
 // asdas
 .wobble-hor-bottom
+  transform: scale(1.4)
   -webkit-animation: wobble-hor-bottom .8s 1
   animation: wobble-hor-bottom .8s 1
+  animation-fill-mode: forwards
+
 
 // @-webkit-keyframes wobble-hor-bottom
 //   0%,100%
@@ -460,7 +464,7 @@ $dark-blue: #263147
     transform: translateY(0)
     -webkit-transform-origin: 50% 50%
     transform-origin: 50% 50%
-    transform: scale(1.8)
+    transform: scale(1.4)
 
   15%
     -webkit-transform: translateY(-30px) rotate(-6deg)
