@@ -1,6 +1,6 @@
 # chatroom
 
-> My good Nuxt.js project
+> LINE Chat room for doraralab new sticker
 
 ## Build Setup
 
