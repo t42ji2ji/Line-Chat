@@ -14,18 +14,11 @@
             .op_item(@click="clean")
               img(src="/name.png")
               span 改名
-      .chat-content(v-on:scroll="watch")
+      .chat-content
 
-        .wrapper
+        .wrapper(v-on:scroll="watch")
           Chat_bubble(ref="childTest")
-        transition( v-on:before-enter="beforeEnter('before-enter')"
-    v-on:enter="beforeEnter('enter')"
-    v-on:after-enter="beforeEnter('afterEnter')"
-    v-on:enter-cancelled="beforeEnter('enterCancelled')"
-    v-on:before-leave="beforeEnter('beforeLeave')"
-    v-on:leave="beforeEnter('leave')"
-    v-on:after-leave="beforeEnter('afterLeave')"
-    v-on:leave-cancelled="beforeEnter('leaveCancelled')")
+        transition
           .stickers_wraper(v-show="isopen_sticker" )
             .slider
               section.slide(v-for="s in 10")
@@ -75,7 +68,8 @@ export default {
       last_dot: null,
       now_slide: 1,
       scroll_var: [0, 0, 0], //nowscroll, scrollheight, lasttimescroll
-      isScrolling: null
+      isScrolling: null,
+      isuser_scroll: false
     };
   },
   computed: {
@@ -147,11 +141,12 @@ export default {
       this.isScrolling = setTimeout(function() {
         // Run the callback
         var scroll_dis = Math.abs(vm.scroll_var[2] - vm.scroll_var[0]);
-        console.log(scroll_dis);
-        if (scroll_dis > 120) {
+        console.log(vm.isuser_scroll);
+        if (scroll_dis > 120 && vm.isuser_scroll) {
           vm.close_all_panle()
         }
         console.log("Scrolling has stopped.");
+        vm.isuser_scroll = true
         vm.scroll_var[2] = vm.scroll_var[0];
       }, 150);
 
@@ -250,7 +245,7 @@ export default {
       }
     },
     scroll_down: function() {
-      let container = this.$el.querySelector(".chat-content");
+      let container = this.$el.querySelector(".wrapper");
       container.scrollTop = container.scrollHeight;
     },
     send_text: function(event) {
@@ -266,8 +261,8 @@ export default {
       // setTimeout(function() {
       //   vm.scroll_down();
       // }, 100);
-
-      this.scroll_down();
+      this.isuser_scroll = false
+      // this.scroll_down();
     },
     open_sticker: function() {
       this.isopen_sticker = !this.isopen_sticker;
@@ -364,10 +359,9 @@ $dark-blue: #263147
   overflow: hidden
   display: flex
   flex-direction: column
+  position: relative
   .wrapper
     height: 100%
-    position: relative
-
     overflow-y: scroll
     overflow-x: hidden
     width: 100%
@@ -462,6 +456,7 @@ $dark-blue: #263147
   background-color: white
   border-bottom: 1.5px solid lightgray
   display: flex
+  flex-direction: column
   position: relative
   // transform: translateY(150px)
   .slider
@@ -487,11 +482,8 @@ $dark-blue: #263147
 
   
   .dots
-    position: absolute
     display: flex
-    left: 50%
-    bottom: 0%
-    transform: translate(-50%, -50%)
+    justify-content: center
     .dot
       cursor: pointer
       margin: 3px
