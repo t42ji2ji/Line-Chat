@@ -127,7 +127,7 @@ export default {
 	min-width: 48px;
 	min-height: 44px;
 	align-self: flex-start;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   line-height: 24px;
   position:relative;
 	padding:10px 20px;
