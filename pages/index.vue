@@ -267,7 +267,7 @@ export default {
       //   vm.scroll_down();
       // }, 100);
 
-      // this.scroll_down();
+      this.scroll_down();
     },
     open_sticker: function() {
       this.isopen_sticker = !this.isopen_sticker;
@@ -366,6 +366,8 @@ $dark-blue: #263147
   flex-direction: column
   .wrapper
     height: 100%
+    position: relative
+
     overflow-y: scroll
     overflow-x: hidden
     width: 100%
