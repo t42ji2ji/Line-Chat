@@ -13,7 +13,7 @@
               span 上傳
             .op_item(@click="clean")
               img(src="/name.png")
-              span 改名
+              span 清除
       .chat-content
         .wrapper(v-on:scroll="watch")
           Chat_bubble(ref="childTest")
