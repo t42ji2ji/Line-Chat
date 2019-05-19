@@ -3,19 +3,28 @@
     .line-window
       .head(v-on:click="open_options") 金水
         .download
-        .options(v-if="isopen_option")
-          .down_btn.op_item(v-on:click="snapshot")
-            img(src="/down.png")
-            span 下載
-          .op_item
-            img.up_btn(src="/down.png")
-            span 上傳
-          .op_item(v-on:click="clean")
-            img(src="/name.png")
-            span 改名
+        transition
+          .options(v-if="isopen_option")
+            .down_btn.op_item(v-on:click="snapshot")
+              img(src="/down.png")
+              span 下載
+            .op_item
+              img.up_btn(src="/down.png")
+              span 上傳
+            .op_item(@click="clean")
+              img(src="/name.png")
+              span 改名
       .chat-content(v-on:scroll="watch")
         Chat_bubble(ref="childTest")
       .input-content
+        //- transition( v-on:before-enter="beforeEnter('before-enter')"
+        //-             v-on:enter="beforeEnter('enter')"
+        //-             v-on:after-enter="beforeEnter('afterEnter')"
+        //-             v-on:enter-cancelled="beforeEnter('enterCancelled')"
+        //-             v-on:before-leave="beforeEnter('beforeLeave')"
+        //-             v-on:leave="beforeEnter('leave')"
+        //-             v-on:after-leave="beforeEnter('afterLeave')"
+        //-             v-on:leave-cancelled="beforeEnter('leaveCancelled')")
         .stickers_wraper(v-show="isopen_sticker")
           .slider
             section.slide(v-for="s in 10")
@@ -63,7 +72,8 @@ export default {
       placeholder: "現在是我在說話!!",
       last_dot: null,
       now_slide: 1,
-      scroll_var: [0, 0]
+      scroll_var: [0, 0, 0], //nowscroll, scrollheight, lasttimescroll
+      isScrolling: null
     };
   },
   computed: {
@@ -84,22 +94,29 @@ export default {
     let dot = this.$el.querySelector(".dot");
     dot.style.backgroundColor = "#263147";
     this.last_dot = dot;
-
     this.keylistener();
   },
   methods: {
-    clean: function(){
-      let message = this.$refs.childTest;
-      message.clean()
+    beforeEnter: function(n){
+      console.log(n);
+      if(n = "beforeLeave"){
+        let gridupdate = this.$el.querySelector(".line-window");
+        gridupdate.style.gridTemplateRows = "70px auto 170px";
+      }
+
     },
-    open_options: function(){
-      this.isopen_option = !this.isopen_option
-      let nav = this.$el.querySelector(".download")
+    clean: function() {
+      let message = this.$refs.childTest;
+      message.clean();
+    },
+    open_options: function() {
+      this.isopen_option = !this.isopen_option;
+      let nav = this.$el.querySelector(".download");
       console.log(nav);
-      if(this.isopen_option){
-        nav.style.transform = "rotate(180deg)"
+      if (this.isopen_option) {
+        nav.style.transform = "rotate(180deg)";
       } else {
-        nav.style.transform = "rotate(0deg)"
+        nav.style.transform = "rotate(0deg)";
       }
     },
     keylistener: function() {
@@ -114,11 +131,31 @@ export default {
       });
     },
     watch: function(event) {
-      // event.preventDefault();
-
+      var vm = this;
       this.scroll_var[0] = event.target.scrollTop;
       this.scroll_var[1] = event.target.scrollHeight;
-      console.log(event.target.scrollTop, event.target.scrollHeight);
+      // console.log(event.target.scrollTop, event.target.scrollHeight,this.scroll_var[2]);
+      window.clearTimeout(this.isScrolling);
+      this.isScrolling = setTimeout(function() {
+        // Run the callback
+        var scroll_dis = Math.abs(vm.scroll_var[2] - vm.scroll_var[0]);
+        console.log(scroll_dis);
+        if (scroll_dis > 120) {
+          vm.close_all_panle()
+        }
+        console.log("Scrolling has stopped.");
+        vm.scroll_var[2] = vm.scroll_var[0];
+      }, 150);
+
+      // var st = this.scroll_var[0];
+      // if (st > this.scroll_var[2]) {
+      //   // downscroll code
+      //   console.log("down");
+      // } else {
+      //   // upscroll code
+      //   console.log("up");
+      // }
+      // this.scroll_var[2] = this.scroll_var[0]
     },
     test: function() {
       // if (this.isopen_sticker)
@@ -131,13 +168,16 @@ export default {
       // );
       // container.childNodes[0].style.transform = "translateY(200px)"
     },
-    snapshot: function() {
+    close_all_panle: function() {
       if (this.isopen_sticker) {
         this.open_sticker();
       }
       if (this.isopen_option) {
-        this.open_options()
+        this.open_options();
       }
+    },
+    snapshot: function() {
+      this.close_all_panle()
       let container = this.$el.querySelector(".chat-content");
       container.style.overflowY = "hidden";
 
@@ -212,13 +252,14 @@ export default {
       this.scroll_down();
     },
     send_img: function(png) {
-      let vm = this
+      let vm = this;
       let message = this.$refs.childTest;
       message.add(!this.isdog_speak, "", true, png);
       // setTimeout(function() {
       //   vm.scroll_down();
       // }, 100);
-      this.scroll_down()
+
+      // this.scroll_down();
     },
     open_sticker: function() {
       this.isopen_sticker = !this.isopen_sticker;
@@ -314,7 +355,7 @@ $dark-blue: #263147
   overflow-x: hidden
   width: 100%
   -webkit-overflow-scrolling: touch
-
+  transition: .2s
   &::-webkit-scrollbar
     width: 8px
     background-color: none
@@ -344,6 +385,7 @@ $dark-blue: #263147
     background-color: white
     display: flex
     align-items: center
+    position: relative
     .state_icon
       filter: grayscale(100%)
       margin-left: 20px
@@ -375,6 +417,7 @@ $dark-blue: #263147
     display: flex
     justify-items: center
     align-items: center
+    position: relative
     .inputclass
       padding-left: 20px
       border-style: none
@@ -403,6 +446,7 @@ $dark-blue: #263147
   border-bottom: 1.5px solid lightgray
   display: flex
   position: relative
+  transform: translateY(20px)
   .slider
     height: 100%
     display: flex
