@@ -15,23 +15,25 @@
               img(src="/name.png")
               span 改名
       .chat-content(v-on:scroll="watch")
-        Chat_bubble(ref="childTest")
+
+        .wrapper
+          Chat_bubble(ref="childTest")
+        transition( v-on:before-enter="beforeEnter('before-enter')"
+    v-on:enter="beforeEnter('enter')"
+    v-on:after-enter="beforeEnter('afterEnter')"
+    v-on:enter-cancelled="beforeEnter('enterCancelled')"
+    v-on:before-leave="beforeEnter('beforeLeave')"
+    v-on:leave="beforeEnter('leave')"
+    v-on:after-leave="beforeEnter('afterLeave')"
+    v-on:leave-cancelled="beforeEnter('leaveCancelled')")
+          .stickers_wraper(v-show="isopen_sticker" )
+            .slider
+              section.slide(v-for="s in 10")
+                .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
+            .dots(key="dot")
+              .dot(v-for="n in 10" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
+              //- .stick(v-for="stick in stickers") {{stick}}
       .input-content
-        //- transition( v-on:before-enter="beforeEnter('before-enter')"
-        //-             v-on:enter="beforeEnter('enter')"
-        //-             v-on:after-enter="beforeEnter('afterEnter')"
-        //-             v-on:enter-cancelled="beforeEnter('enterCancelled')"
-        //-             v-on:before-leave="beforeEnter('beforeLeave')"
-        //-             v-on:leave="beforeEnter('leave')"
-        //-             v-on:after-leave="beforeEnter('afterLeave')"
-        //-             v-on:leave-cancelled="beforeEnter('leaveCancelled')")
-        .stickers_wraper(v-show="isopen_sticker")
-          .slider
-            section.slide(v-for="s in 10")
-              .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
-          .dots(key="dot")
-            .dot(v-for="n in 10" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
-            //- .stick(v-for="stick in stickers") {{stick}}
         .state_controller
           .state_icon.state_hover(style="background-image: url('/dog-face.png')" v-on:click="speak(true)")
           .state_icon.state_hover(style="background-image: url('/cat-face.png')" v-on:click="speak(false)")
@@ -87,7 +89,14 @@ export default {
         now = 10;
       } else now = this.now_slide;
       return now;
-    }
+    },
+    // sticker_h() {
+    //   if(this.isopen_sticker){
+    //     return  "150px"
+    //   } else {
+    //     return 0
+    //   }
+    // }
   },
   mounted() {
     this.$el.querySelectorAll(".state_icon")[1].style.filter = "grayscale(0%)";
@@ -99,9 +108,8 @@ export default {
   methods: {
     beforeEnter: function(n){
       console.log(n);
-      if(n = "beforeLeave"){
-        let gridupdate = this.$el.querySelector(".line-window");
-        gridupdate.style.gridTemplateRows = "70px auto 170px";
+      if(n = "before-enter"){
+        // gridupdate.style.gridTemplateRows = "70px auto 170px";
       }
 
     },
@@ -267,13 +275,13 @@ export default {
       let arrow = this.$el.querySelector(".arrow_wrapper");
 
       if (this.isopen_sticker) {
-        gridupdate.style.gridTemplateRows = "70px auto 320px";
+        // gridupdate.style.gridTemplateRows = "70px auto 320px";
         this.$el.querySelectorAll(".state_icon")[2].style.filter =
           "grayscale(0%)";
         arrow.style.opacity = 1;
         arrow.style.transform = "translateY(0px)";
       } else {
-        gridupdate.style.gridTemplateRows = "70px auto 170px";
+        // gridupdate.style.gridTemplateRows = "70px auto 170px";
         this.$el.querySelectorAll(".state_icon")[2].style.filter =
           "grayscale(100%)";
         arrow.style.opacity = 0;
@@ -351,18 +359,24 @@ $dark-blue: #263147
         font-size: 1rem
 
 .chat-content
-  overflow-y: scroll
-  overflow-x: hidden
   width: 100%
-  -webkit-overflow-scrolling: touch
-  transition: .2s
-  &::-webkit-scrollbar
-    width: 8px
-    background-color: none
-  &::-webkit-scrollbar-thumb
-    border-radius: 3px
-    background-color: rgba(#2c2c2c, .5)
-
+  height: auto
+  overflow: hidden
+  display: flex
+  flex-direction: column
+  .wrapper
+    height: 100%
+    overflow-y: scroll
+    overflow-x: hidden
+    width: 100%
+    -webkit-overflow-scrolling: touch
+    transition: .2s
+    &::-webkit-scrollbar
+      width: 8px
+      background-color: none
+    &::-webkit-scrollbar-thumb
+      border-radius: 3px
+      background-color: rgba(#2c2c2c, .5)
 // #style-4::-webkit-scrollbar
 // {
 // 	width: 10px;
@@ -380,6 +394,7 @@ $dark-blue: #263147
   width: 100%
   transition: 2s
   height: 170px
+  align-self: end
   .state_controller
     height: 70px
     background-color: white
@@ -446,7 +461,7 @@ $dark-blue: #263147
   border-bottom: 1.5px solid lightgray
   display: flex
   position: relative
-  transform: translateY(20px)
+  // transform: translateY(150px)
   .slider
     height: 100%
     display: flex
@@ -593,18 +608,20 @@ $dark-blue: #263147
 
 
 .v-leave
-  opacity: 1
+  // opacity: 1
+  height: 150px
 .v-leave-active
-  transition: opacity .5s
-
+  transition: .5s ease
 .v-leave-to
-  opacity: 0
+  height: 0px
+
 .v-enter
-  opacity: 0
+  height: 0px
 .v-enter-active
-  transition: opacity .2s
+  transition: .3s ease
 .v-enter-to
-  opacity: 1
+  height: 150px
+
 
 // arrow
 .arrow
