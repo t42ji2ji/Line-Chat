@@ -322,11 +322,11 @@ export default {
       this.text = "搜尋中．．．．";
       this.send_text();
       axios.get(getCount).then(function(response) {
-        console.log(response);
+        console.log(response.data);
+        let random = Math.floor(Math.random()*response.data);
         axios
           .get(
-            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?sk=${response.data -
-              1}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
+            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?sk=${random}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
           )
           .then(function(response) {
             console.log(response.data[0].message);
