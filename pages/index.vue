@@ -8,24 +8,26 @@
             .down_btn.op_item(v-on:click="snapshot")
               img(src="/down.png")
               span 下載
-            .op_item
+            .op_item(@click="upload_story")
               img.up_btn(src="/down.png")
               span 上傳
+            .op_item(@click="load_story")
+              img(src="/random.png")
+              span 隨機
             .op_item(@click="clean")
-              img(src="/name.png")
+              img(src="/clean.png")
               span 清除
       .chat-content
         .wrapper(v-on:scroll="watch")
           Chat_bubble(ref="childTest")
       .input-content
-        transition
-            .stickers_wraper(v-show="isopen_sticker" )
-              .slider
-                section.slide(v-for="s in 11")
-                  .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
-              .dots(key="dot")
-                .dot(v-for="n in 11" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
-                //- .stick(v-for="stick in stickers") {{stick}}
+        .stickers_wraper(v-show="isopen_sticker" )
+          .slider
+            section.slide(v-for="s in 11")
+              .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
+          .dots(key="dot")
+            .dot(v-for="n in 11" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
+            //- .stick(v-for="stick in stickers") {{stick}}
         .state_controller
           .state_icon.state_hover(style="background-image: url('/dog-face.png')" v-on:click="speak(true)")
           .state_icon.state_hover(style="background-image: url('/cat-face.png')" v-on:click="speak(false)")
@@ -34,6 +36,7 @@
           .arrow_wrapper
             i.arrow.left(v-on:click="stick_slide_btn(false)")
             i.arrow.right(v-on:click="stick_slide_btn(true)")
+          a.state_icon(style="background-image: url('/line.png'); filter: grayscale(0); margin-left:auto;margin-right:20px;" v-on:click="open_sticker" target="_blank" href="https://store.line.me/stickershop/product/7662172/zh-Hant")
 
         .inp
           input.inputclass(v-model="text" :placeholder = "placeholder")
@@ -50,6 +53,8 @@
 <script>
 import Logo from "~/components/Logo.vue";
 import Chat_bubble from "~/components/Chat_bubble.vue";
+// import axios from "~/plugins/axios";
+import * as axios from "axios";
 
 export default {
   components: {
@@ -69,7 +74,9 @@ export default {
       scroll_var: [0, 0, 0], //nowscroll, scrollheight, lasttimescroll
       isScrolling: null,
       isuser_scroll: false,
-      ismobile: false
+      ismobile: false,
+      story: [],
+      message: null
     };
   },
   computed: {
@@ -99,6 +106,8 @@ export default {
     this.last_dot = dot;
     this.ismobile = this.mobile_detec();
     this.keylistener();
+    this.message = this.$refs.childTest;
+    this.story.push([false, "hey", false, ""]);
   },
   methods: {
     mobile_detec: function() {
@@ -117,19 +126,17 @@ export default {
       return check;
     },
     beforeEnter: function(n) {
-      console.log(n);
       if ((n = "before-enter")) {
         // gridupdate.style.gridTemplateRows = "70px auto 170px";
       }
     },
     clean: function() {
-      let message = this.$refs.childTest;
-      message.clean();
+      this.message.clean();
+      this.story = [];
     },
     open_options: function() {
       this.isopen_option = !this.isopen_option;
       let nav = this.$el.querySelector(".download");
-      console.log(nav);
       if (this.isopen_option) {
         nav.style.transform = "rotate(180deg)";
       } else {
@@ -218,7 +225,6 @@ export default {
     },
     stick_slide: function(n) {
       this.now_slide = n;
-      console.log(this.slide_to, this.now_slide);
       let slider = this.$el.querySelector(".slider");
       let scrollto = slider.offsetWidth * (this.slide_to - 1) + "px";
       slider.style.transform = `translateX(-${scrollto})`;
@@ -263,21 +269,93 @@ export default {
       let container = this.$el.querySelector(".wrapper");
       container.scrollTop = container.scrollHeight;
     },
-    send_text: function(event) {
-      let message = this.$refs.childTest;
-      message.add(!this.isdog_speak, this.text, false);
+    send_text: function(skipStory=false) {
+      this.message.add(!this.isdog_speak, this.text, false);
+      if(!skipStory)
+        this.push_story(!this.isdog_speak, this.text, false, "");
       this.text = "";
       this.scroll_down();
     },
     send_img: function(png) {
       let vm = this;
-      let message = this.$refs.childTest;
-      message.add(!this.isdog_speak, "", true, png);
+      this.message.add(!this.isdog_speak, "", true, png);
+      this.push_story(!this.isdog_speak, "", true, png);
       // setTimeout(function() {
       //   vm.scroll_down();
       // }, 100);
       this.isuser_scroll = false;
       this.scroll_down();
+    },
+    push_story: function(isdog, text, isimg, pg) {
+      this.story.push([isdog, text, isimg, pg]);
+    },
+    upload_story: async function() {
+      let vm = this
+      this.scroll_down()
+      this.text = "上傳中..."
+      this.send_text(true)
+      let vt = new Date(Date.now());
+      console.log(this.story);
+      const st = {
+        message: [
+          this.story
+        ],
+        time: vt
+      };
+
+      axios
+        .post(
+          "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj",
+          st
+        )
+        .then(function(response) {
+          console.log(response);
+          vm.text = "上傳成功"
+          vm.send_text(true)
+        });
+    },
+    load_story: function() {
+      var vm = this;
+      let getCount =
+        "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?c=true&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj";
+      this.clean();
+      this.text = "搜尋中．．．．";
+      this.send_text();
+      axios.get(getCount).then(function(response) {
+        console.log(response);
+        axios
+          .get(
+            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?sk=${response.data -
+              1}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
+          )
+          .then(function(response) {
+            console.log(response.data[0].message);
+            vm.clean();
+            story_mapping(response.data[0].message[0])
+          });
+      });
+
+      // let vm = this;
+      // let storys = [
+      //   [true, "", true, 3],
+      //   [true, "asdasd", false, ""],
+      //   [false, "asdasd", false, ""],
+      //   [false, "", true, 3],
+      //   [false, "", true, 4],
+      //   [false, "", true, 16],
+      //   [true, "qweqwe", false, ""]
+      // ];
+      function story_mapping(storys) {
+        storys.forEach(function(item) {
+          if (item[2]) {
+            console.log(item[0], item[1], item[2], item[3]);
+            vm.message.add(item[0], item[1], item[2], item[3]);
+          } else {
+            console.log(item[0], item[1], item[2], item[3]);
+            vm.message.add(item[0], item[1], item[2], item[3]);
+          }
+        });
+      }
     },
     open_sticker: function() {
       this.isopen_sticker = !this.isopen_sticker;
@@ -618,19 +696,18 @@ $dark-blue: #263147
 
 
 .v-leave
-  // opacity: 1
-  height: 150px
+  opacity: 1
 .v-leave-active
   transition: .3s ease
 .v-leave-to
-  height: 0px
+  opacity: 0
 
 .v-enter
-  height: 0px
+  opacity: 0
 .v-enter-active
   transition: .3s ease
 .v-enter-to
-  height: 150px
+  opacity: 1
 
 
 // arrow

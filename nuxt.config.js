@@ -54,7 +54,12 @@ export default {
     /*
     ** You can extend webpack config here
     */
+   vendor:['axios'],
     extend(config, ctx) {
     }
   }
+  // serverMiddleware: [
+  //   // API middleware
+  //   '~/api/index.js'
+  // ]
 }
