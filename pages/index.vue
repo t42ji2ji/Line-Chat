@@ -3,20 +3,19 @@
     .line-window
       .head(v-on:click="open_options") 金水
         .download
-        transition
-          .options(v-if="isopen_option")
-            .down_btn.op_item(v-on:click="snapshot")
-              img(src="/down.png")
-              span 下載
-            .op_item(@click="upload_story")
-              img.up_btn(src="/down.png")
-              span 上傳
-            .op_item(@click="load_story")
-              img(src="/random.png")
-              span 隨機
-            .op_item(@click="clean")
-              img(src="/clean.png")
-              span 清除
+        .options(v-show="isopen_option")
+          .down_btn.op_item(v-on:click="snapshot")
+            img(src="/down.png")
+            span 截圖
+          .op_item(@click="upload_story")
+            img.up_btn(src="/down.png")
+            span 上傳對話
+          .op_item(@click="load_story")
+            img(src="/random.png")
+            span 隨機範例
+          .op_item(@click="clean")
+            img(src="/clean.png")
+            span 清除
       .chat-content
         .wrapper(v-on:scroll="watch")
           Chat_bubble(ref="childTest")
@@ -135,7 +134,10 @@ export default {
       this.story = [];
     },
     open_options: function() {
+      
+      console.log("op");
       this.isopen_option = !this.isopen_option;
+
       let nav = this.$el.querySelector(".download");
       if (this.isopen_option) {
         nav.style.transform = "rotate(180deg)";
@@ -203,7 +205,7 @@ export default {
     },
     snapshot: function() {
       this.close_all_panle();
-      let container = this.$el.querySelector(".chat-content");
+      let container = this.$el.querySelector(".wrapper");
       container.style.overflowY = "hidden";
 
       let screnshot = this.$el.querySelector(".screenshot");
@@ -305,7 +307,7 @@ export default {
 
       axios
         .post(
-          "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj",
+          "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/lottery?apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj",
           st
         )
         .then(function(response) {
@@ -447,6 +449,10 @@ $dark-blue: #263147
         margin-top: -5px
         height: 50%
         font-size: 1rem
+        pointer-events: none
+      img
+        pointer-events: none
+
 
 .chat-content
   width: 100%
