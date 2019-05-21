@@ -75,7 +75,8 @@ export default {
       isuser_scroll: false,
       ismobile: false,
       story: [],
-      message: null
+      message: null,
+      ip: ""
     };
   },
   computed: {
@@ -99,6 +100,7 @@ export default {
     // }
   },
   mounted() {
+    this.getip();
     this.$el.querySelectorAll(".state_icon")[1].style.filter = "grayscale(0%)";
     let dot = this.$el.querySelector(".dot");
     dot.style.backgroundColor = "#263147";
@@ -109,6 +111,12 @@ export default {
     this.story.push([false, "hey", false, ""]);
   },
   methods: {
+    getip: async function() {
+      await axios.get("https://api.ipify.org").then(response => {
+        console.log("yoyo", response.data);
+        this.ip = response.data
+      });
+    },
     mobile_detec: function() {
       var check = false;
       (function(a) {
@@ -134,7 +142,6 @@ export default {
       this.story = [];
     },
     open_options: function() {
-      
       console.log("op");
       this.isopen_option = !this.isopen_option;
 
@@ -271,10 +278,9 @@ export default {
       let container = this.$el.querySelector(".wrapper");
       container.scrollTop = container.scrollHeight;
     },
-    send_text: function(skipStory=false) {
+    send_text: function(skipStory = false) {
       this.message.add(!this.isdog_speak, this.text, false);
-      if(!skipStory)
-        this.push_story(!this.isdog_speak, this.text, false, "");
+      if (!skipStory) this.push_story(!this.isdog_speak, this.text, false, "");
       this.text = "";
       this.scroll_down();
     },
@@ -292,17 +298,15 @@ export default {
       this.story.push([isdog, text, isimg, pg]);
     },
     upload_story: async function() {
-      let vm = this
-      this.scroll_down()
-      this.text = "上傳中..."
-      this.send_text(true)
+      let vm = this;
+      this.scroll_down();
+      this.text = "上傳中...";
+      this.send_text(true);
       let vt = new Date(Date.now());
-      console.log(this.story);
       const st = {
-        message: [
-          this.story
-        ],
-        time: vt
+        message: [this.story],
+        time: vt,
+        ip: this.ip
       };
 
       axios
@@ -311,10 +315,9 @@ export default {
           st
         )
         .then(function(response) {
-          console.log(response);
-          vm.text = "上傳成功"
-          vm.send_text(true)
-          vm.story = []
+          vm.text = "上傳成功";
+          vm.send_text(true);
+          vm.story = [];
         });
     },
     load_story: function() {
@@ -326,7 +329,7 @@ export default {
       this.send_text();
       axios.get(getCount).then(function(response) {
         console.log(response.data);
-        let random = Math.floor(Math.random()*response.data);
+        let random = Math.floor(Math.random() * response.data);
         axios
           .get(
             `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?sk=${random}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
@@ -334,7 +337,7 @@ export default {
           .then(function(response) {
             console.log(response.data[0].message);
             vm.clean();
-            story_mapping(response.data[0].message[0])
+            story_mapping(response.data[0].message[0]);
           });
       });
 
