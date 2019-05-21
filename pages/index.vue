@@ -314,6 +314,7 @@ export default {
           console.log(response);
           vm.text = "上傳成功"
           vm.send_text(true)
+          vm.story = []
         });
     },
     load_story: function() {
