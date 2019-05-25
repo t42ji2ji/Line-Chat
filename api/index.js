@@ -15,9 +15,13 @@
 //   path: '/api',
 //   handler: app
 // }
+const express = require('express')
 
-const app = require('express')();
-const storys = require('./routes/storys');
+const app = express()
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+// const app = require('express')();
+// const storys = require('./routes/storys');
 const mongoose = require('mongoose');
 
 //mongo
@@ -41,32 +45,49 @@ var StorySchema = new Schema({
     time: { type: Date}                  
 });
 
-var storyModel = mongoose.model('story',StorySchema);
+var storyModel = mongoose.model('test',StorySchema);
 
 //插入
 
 //mongo
 
-app.use(storys);
+// app.use(storys);
 module.exports = { path: '/api', handler: app };
 
 app.get('/say', (req, res, next) => {
+    console.log("say");
   res.json({"name": "err"});
 });
 
-app.get('/insert', (req, res, next) => {
-    
-    var onestory = new storyModel({
-        message: [[[true,"",true,3],[true,"成功",false,""],[false,"asdasd",false,""],[false,"",true,3],[false,"",true,4],[false,"",true,16],[true,"qweqwe",false,""]]]
-    })
-    onestory.save(function(err, res){
+app.post('/insert_post', (req, res, next) => {
+    let v = ""
+    console.log(req.body);
+    var onestory = new storyModel(req.body)
+    onestory.save(function(err, response){
         if (err) {
-            console.log("Error:" + err);
+            res.json({"state": err});
         }
         else {
-            console.log("Res:" + res);
-            vm.json({"n":"scuess"})
+            res.json({"state": "isok"});
         }
     })
-    next()
+});
+
+
+app.get('/insert', (req, res, next) => {
+    var rr = res
+    var onestory = new storyModel({
+        message: [[[true,"",true,3],[true,"express",false,""],[false,"asdasd",false,""],[false,"",true,3],[false,"",true,4],[false,"",true,16],[true,"qweqwe",false,""]]]
+    })
+    onestory.save(function(err, response){
+        if (err) {
+            console.log("Error:" + err);
+            res.json({"response": "no"})
+        }
+        else {
+            console.log("Res:" + response);
+            res.json({"response": "ok"})
+
+        }
+    })
 });

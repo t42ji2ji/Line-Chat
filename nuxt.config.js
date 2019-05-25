@@ -57,9 +57,9 @@ export default {
    vendor:['axios'],
     extend(config, ctx) {
     }
-  }
-  // serverMiddleware: [
-  //   // API middleware
-  //   '~/api/index.js'
-  // ]
+  },
+  serverMiddleware: [
+    // API middleware
+    '~/api/index.js'
+  ]
 }

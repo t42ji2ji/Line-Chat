@@ -3,30 +3,32 @@
     .line-window
       .head(v-on:click="open_options") 金水
         .download
-        .options(v-show="isopen_option")
-          .down_btn.op_item(v-on:click="snapshot")
-            img(src="/down.png")
-            span 截圖
-          .op_item(@click="upload_story")
-            img.up_btn(src="/down.png")
-            span 上傳對話
-          .op_item(@click="load_story")
-            img(src="/random.png")
-            span 隨機範例
-          .op_item(@click="clean")
-            img(src="/clean.png")
-            span 清除
+        transition
+          .options(v-show="isopen_option")
+            .down_btn.op_item(v-on:click="snapshot")
+              img(src="/down.png")
+              span 截圖
+            .op_item(@click="upload_story")
+              img.up_btn(src="/down.png")
+              span 上傳對話
+            .op_item(@click="load_story")
+              img(src="/random.png")
+              span 隨機範例
+            .op_item(@click="clean")
+              img(src="/clean.png")
+              span 清除
       .chat-content
         .wrapper(v-on:scroll="watch")
           Chat_bubble(ref="childTest")
       .input-content
-        .stickers_wraper(v-show="isopen_sticker" )
-          .slider
-            section.slide(v-for="s in 11")
-              .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
-          .dots(key="dot")
-            .dot(v-for="n in 11" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
-            //- .stick(v-for="stick in stickers") {{stick}}
+        transition(name="scale")
+          .stickers_wraper(v-show="isopen_sticker" )
+            .slider
+              section.slide(v-for="s in 11")
+                .sticker(v-for="n in 4" v-on:click="send_img((s-1)*4 + n)" v-bind:style="{ 'background-image': 'url(/sticker/' + ((s-1)*4 + n) + '.png)' }")
+            .dots(key="dot")
+              .dot(v-for="n in 11" v-on:click="stick_slide(n)" v-bind:id="'dot_' + n")
+              //- .stick(v-for="stick in stickers") {{stick}}
         .state_controller
           .state_icon.state_hover(style="background-image: url('/dog-face.png')" v-on:click="speak(true)")
           .state_icon.state_hover(style="background-image: url('/cat-face.png')" v-on:click="speak(false)")
@@ -113,8 +115,7 @@ export default {
   methods: {
     getip: async function() {
       await axios.get("https://api.ipify.org").then(response => {
-        console.log("yoyo", response.data);
-        this.ip = response.data
+        this.ip = response.data;
       });
     },
     mobile_detec: function() {
@@ -142,9 +143,7 @@ export default {
       this.story = [];
     },
     open_options: function() {
-      console.log("op");
       this.isopen_option = !this.isopen_option;
-
       let nav = this.$el.querySelector(".download");
       if (this.isopen_option) {
         nav.style.transform = "rotate(180deg)";
@@ -159,7 +158,7 @@ export default {
         } else if (event.keyCode == 39 && this.isopen_sticker) {
           this.stick_slide_btn(true);
         } else if (event.keyCode == 13) {
-          this.send_text();
+          // this.send_text();
         }
       });
     },
@@ -192,15 +191,7 @@ export default {
       // this.scroll_var[2] = this.scroll_var[0]
     },
     test: function() {
-      // if (this.isopen_sticker)
-      //   this.open_sticker();
-      // console.log("test");
-      // let container = this.$el.querySelector(".chat-content");
-      // container.style.overflowY = "hidden";
-      // console.log(
-      //   (this.scroll_var[0] * this.scroll_var[0]) / this.scroll_var[1]
-      // );
-      // container.childNodes[0].style.transform = "translateY(200px)"
+
     },
     close_all_panle: function() {
       if (this.isopen_sticker) {
@@ -280,7 +271,8 @@ export default {
     },
     send_text: function(skipStory = false) {
       this.message.add(!this.isdog_speak, this.text, false);
-      if (!skipStory) this.push_story(!this.isdog_speak, this.text, false, "");
+      if (!skipStory) 
+        this.push_story(!this.isdog_speak, this.text, false, "");
       this.text = "";
       this.scroll_down();
     },
@@ -297,7 +289,7 @@ export default {
     push_story: function(isdog, text, isimg, pg) {
       this.story.push([isdog, text, isimg, pg]);
     },
-    upload_story: async function() {
+    upload_story_malb: async function() {
       let vm = this;
       this.scroll_down();
       this.text = "上傳中...";
@@ -320,22 +312,42 @@ export default {
           vm.story = [];
         });
     },
+    upload_story: function() {
+      let vm = this
+      this.scroll_down();
+      this.text = "上傳中...";
+      this.send_text(true);
+      let vt = new Date(Date.now());
+      const st = {
+        message: [this.story],
+        time: vt,
+        ip: this.ip
+      };
+      let posturl = `http://${process.env.HOST || "localhost"}:${process.env
+        .PORT || 3000}`;
+      axios.post(posturl + "/api/insert_post", st).then(function(response) {
+        vm.text = "上傳成功";
+        console.log(response);
+        vm.send_text(true);
+        vm.story = [];
+      });
+    },
     load_story: function() {
       var vm = this;
-      let getCount =
-        "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?c=true&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj";
+      var now_state = "lottery"; // stories
+      let getCount = `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/${now_state}?c=true&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`;
       this.clean();
       this.text = "搜尋中．．．．";
       this.send_text();
       axios.get(getCount).then(function(response) {
-        console.log(response.data);
         let random = Math.floor(Math.random() * response.data);
         axios
           .get(
-            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/stories?sk=${random}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
+            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/${now_state}?sk=${random}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
           )
           .then(function(response) {
-            console.log(response.data[0].message);
+            console.log(random);
+            // console.log(response.data);
             vm.clean();
             story_mapping(response.data[0].message[0]);
           });
@@ -354,10 +366,8 @@ export default {
       function story_mapping(storys) {
         storys.forEach(function(item) {
           if (item[2]) {
-            console.log(item[0], item[1], item[2], item[3]);
             vm.message.add(item[0], item[1], item[2], item[3]);
           } else {
-            console.log(item[0], item[1], item[2], item[3]);
             vm.message.add(item[0], item[1], item[2], item[3]);
           }
         });
@@ -673,6 +683,10 @@ $dark-blue: #263147
 //   75%
 //     -webkit-transform: translateY(-6px) rotate(-1.2deg)
 //     transform: translateY(-6px) rotate(-1.2deg)
+.scale-enter-active, .scale-leave-active
+  transition: .5s
+.scale-enter, .scale-leave-to /* .fade-leave-active below version 2.1.8 */ 
+  height: 0
 
 
 @keyframes wobble-hor-bottom
