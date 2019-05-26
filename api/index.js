@@ -60,7 +60,6 @@ app.get('/say', (req, res, next) => {
 });
 
 app.post('/insert_post', (req, res, next) => {
-    let v = ""
     console.log(req.body);
     var onestory = new storyModel(req.body)
     onestory.save(function(err, response){
@@ -74,20 +73,20 @@ app.post('/insert_post', (req, res, next) => {
 });
 
 
-app.get('/insert', (req, res, next) => {
-    var rr = res
-    var onestory = new storyModel({
-        message: [[[true,"",true,3],[true,"express",false,""],[false,"asdasd",false,""],[false,"",true,3],[false,"",true,4],[false,"",true,16],[true,"qweqwe",false,""]]]
-    })
-    onestory.save(function(err, response){
-        if (err) {
-            console.log("Error:" + err);
-            res.json({"response": "no"})
-        }
-        else {
-            console.log("Res:" + response);
-            res.json({"response": "ok"})
+// app.get('/insert', (req, res, next) => {
+//     var rr = res
+//     var onestory = new storyModel({
+//         message: [[[true,"",true,3],[true,"express",false,""],[false,"asdasd",false,""],[false,"",true,3],[false,"",true,4],[false,"",true,16],[true,"qweqwe",false,""]]]
+//     })
+//     onestory.save(function(err, response){
+//         if (err) {
+//             console.log("Error:" + err);
+//             res.json({"response": "no"})
+//         }
+//         else {
+//             console.log("Res:" + response);
+//             res.json({"response": "ok"})
 
-        }
-    })
-});
+//         }
+//     })
+// });
