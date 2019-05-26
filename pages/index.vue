@@ -147,8 +147,12 @@ export default {
       let nav = this.$el.querySelector(".download");
       if (this.isopen_option) {
         nav.style.transform = "rotate(180deg)";
+              console.log("open");
+
       } else {
         nav.style.transform = "rotate(0deg)";
+              console.log("close");
+
       }
     },
     keylistener: function() {
@@ -194,6 +198,7 @@ export default {
 
     },
     close_all_panle: function() {
+
       if (this.isopen_sticker) {
         this.open_sticker();
       }
@@ -201,27 +206,38 @@ export default {
         this.open_options();
       }
     },
-    snapshot: function() {
+    snapshot: function(e) {
+      if(e){
+        e.stopPropagation()
+        console.log("in");
+      }
       this.close_all_panle();
+
       let container = this.$el.querySelector(".wrapper");
       container.style.overflowY = "hidden";
-
       let screnshot = this.$el.querySelector(".screenshot");
       this.isshow_window = !this.isshow_window;
       let node = this.$el.querySelector(".line-window");
       let input = this.$el.querySelector(".inputclass");
       input.setAttribute("placeholder", "");
       screnshot.src = "/LOADING.png";
-
-      domtoimage
+      setTimeout(
+      () => {
+         domtoimage
         .toPng(node, { scrollFix: true })
         .then(function(dataUrl) {
+          console.info("png");
+
           screnshot.src = dataUrl;
           container.style.overflowY = "scroll";
         })
         .catch(function(error) {
           console.error("oops, something went wrong!", error);
         });
+      }
+      , 300);
+
+     
     },
     stick_slide: function(n) {
       this.now_slide = n;
@@ -289,29 +305,6 @@ export default {
     push_story: function(isdog, text, isimg, pg) {
       this.story.push([isdog, text, isimg, pg]);
     },
-    upload_story_malb: async function() {
-      let vm = this;
-      this.scroll_down();
-      this.text = "上傳中...";
-      this.send_text(true);
-      let vt = new Date(Date.now());
-      const st = {
-        message: [this.story],
-        time: vt,
-        ip: this.ip
-      };
-
-      axios
-        .post(
-          "https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/lottery?apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj",
-          st
-        )
-        .then(function(response) {
-          vm.text = "上傳成功";
-          vm.send_text(true);
-          vm.story = [];
-        });
-    },
     upload_story: function() {
       let vm = this
       this.scroll_down();
@@ -334,35 +327,16 @@ export default {
     },
     load_story: function() {
       var vm = this;
-      var now_state = "lottery"; // stories
-      let getCount = `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/${now_state}?c=true&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`;
+      let posturl = `http://${process.env.HOST || "localhost"}:${process.env.PORT || 3000}`;
       this.clean();
       this.text = "搜尋中．．．．";
       this.send_text();
-      axios.get(getCount).then(function(response) {
-        let random = Math.floor(Math.random() * response.data);
-        axios
-          .get(
-            `https://api.mlab.com/api/1/databases/heroku_8b9vnpp1/collections/${now_state}?sk=${random}&l=1&apiKey=fS2vwikBergFkfL5bEsBZ4nOkbtAa1Rj`
-          )
-          .then(function(response) {
-            console.log(random);
+      axios.get(posturl + "/api/get_stories").then(function(response) {
             // console.log(response.data);
             vm.clean();
             story_mapping(response.data[0].message[0]);
-          });
-      });
+      })
 
-      // let vm = this;
-      // let storys = [
-      //   [true, "", true, 3],
-      //   [true, "asdasd", false, ""],
-      //   [false, "asdasd", false, ""],
-      //   [false, "", true, 3],
-      //   [false, "", true, 4],
-      //   [false, "", true, 16],
-      //   [true, "qweqwe", false, ""]
-      // ];
       function story_mapping(storys) {
         storys.forEach(function(item) {
           if (item[2]) {
@@ -447,6 +421,7 @@ $dark-blue: #263147
     flex-direction: row
     justify-content: space-around
     align-items: center
+    
 
     .op_item
       flex: 1
@@ -630,7 +605,7 @@ $dark-blue: #263147
   height: 4px
   background-color: white
   border-radius: 5px
-  transition: .4s
+  transition: .3s
   &:before, &:after
     content: ""
     position: absolute
@@ -684,7 +659,7 @@ $dark-blue: #263147
 //     -webkit-transform: translateY(-6px) rotate(-1.2deg)
 //     transform: translateY(-6px) rotate(-1.2deg)
 .scale-enter-active, .scale-leave-active
-  transition: .5s
+  transition: .3s
 .scale-enter, .scale-leave-to /* .fade-leave-active below version 2.1.8 */ 
   height: 0
 

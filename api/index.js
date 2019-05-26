@@ -39,14 +39,17 @@ db.once('open', function callback () {
 
 
 var Schema = mongoose.Schema;
-
 var StorySchema = new Schema({          
     message : { type: Array },
     time: { type: Date}                  
 });
 
-var storyModel = mongoose.model('test',StorySchema);
+var loadStory = new Schema({ message : { type: Array },
+    time: { type: Date}, ip : { type: String} }, 
+    { collection : 'stories' }); 
 
+var storyModel = mongoose.model('lottery' ,StorySchema);
+var loadStoryModel = mongoose.model('stories', loadStory)
 //插入
 
 //mongo
@@ -72,21 +75,14 @@ app.post('/insert_post', (req, res, next) => {
     })
 });
 
+app.get('/get_stories', (req, res, next) => {
+    let random = Math.floor(Math.random() * 12);
+    promise = loadStoryModel.find().skip(random)
+    .limit(1).exec() .then(function(docs) {
+        console.log(docs);
+        res.json(docs)
+    }, function(err) {
+        console.log(err);
+    });
+})
 
-// app.get('/insert', (req, res, next) => {
-//     var rr = res
-//     var onestory = new storyModel({
-//         message: [[[true,"",true,3],[true,"express",false,""],[false,"asdasd",false,""],[false,"",true,3],[false,"",true,4],[false,"",true,16],[true,"qweqwe",false,""]]]
-//     })
-//     onestory.save(function(err, response){
-//         if (err) {
-//             console.log("Error:" + err);
-//             res.json({"response": "no"})
-//         }
-//         else {
-//             console.log("Res:" + response);
-//             res.json({"response": "ok"})
-
-//         }
-//     })
-// });
