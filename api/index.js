@@ -15,9 +15,12 @@
 //   path: '/api',
 //   handler: app
 // }
-const express = require('express')
+const express = require('express');
+const cors = require('cors');
 
 const app = express()
+
+app.use(cors()); // For cors env
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 // const app = require('express')();
@@ -49,7 +52,7 @@ var loadStory = new Schema({ message : { type: Array },
     { collection : 'stories' }); 
 
 var storyModel = mongoose.model('lottery' ,StorySchema);
-var loadStoryModel = mongoose.model('stories', loadStory)
+var loadStoryModel = mongoose.model('stories', loadStory);
 //插入
 
 //mongo
