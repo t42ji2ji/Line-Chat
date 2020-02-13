@@ -8,9 +8,9 @@
             .down_btn.op_item(v-on:click="snapshot")
               img(src="/down.png")
               span 截圖
-            .op_item(@click="upload_story")
-              img.up_btn(src="/down.png")
-              span 上傳對話
+            //- .op_item(@click="upload_story")
+            //-   img.up_btn(src="/down.png")
+            //-   span 上傳對話
             .op_item(@click="load_story")
               img(src="/random.png")
               span 隨機範例
@@ -147,12 +147,10 @@ export default {
       let nav = this.$el.querySelector(".download");
       if (this.isopen_option) {
         nav.style.transform = "rotate(180deg)";
-              console.log("open");
-
+        console.log("open");
       } else {
         nav.style.transform = "rotate(0deg)";
-              console.log("close");
-
+        console.log("close");
       }
     },
     keylistener: function() {
@@ -194,11 +192,8 @@ export default {
       // }
       // this.scroll_var[2] = this.scroll_var[0]
     },
-    test: function() {
-
-    },
+    test: function() {},
     close_all_panle: function() {
-
       if (this.isopen_sticker) {
         this.open_sticker();
       }
@@ -207,8 +202,8 @@ export default {
       }
     },
     snapshot: function(e) {
-      if(e){
-        e.stopPropagation()
+      if (e) {
+        e.stopPropagation();
         console.log("in");
       }
       this.close_all_panle();
@@ -221,23 +216,19 @@ export default {
       let input = this.$el.querySelector(".inputclass");
       input.setAttribute("placeholder", "");
       screnshot.src = "/LOADING.png";
-      setTimeout(
-      () => {
-         domtoimage
-        .toPng(node, { scrollFix: true })
-        .then(function(dataUrl) {
-          console.info("png");
+      setTimeout(() => {
+        domtoimage
+          .toPng(node, { scrollFix: true })
+          .then(function(dataUrl) {
+            console.info("png");
 
-          screnshot.src = dataUrl;
-          container.style.overflowY = "scroll";
-        })
-        .catch(function(error) {
-          console.error("oops, something went wrong!", error);
-        });
-      }
-      , 300);
-
-     
+            screnshot.src = dataUrl;
+            container.style.overflowY = "scroll";
+          })
+          .catch(function(error) {
+            console.error("oops, something went wrong!", error);
+          });
+      }, 300);
     },
     stick_slide: function(n) {
       this.now_slide = n;
@@ -287,8 +278,7 @@ export default {
     },
     send_text: function(skipStory = false) {
       this.message.add(!this.isdog_speak, this.text, false);
-      if (!skipStory) 
-        this.push_story(!this.isdog_speak, this.text, false, "");
+      if (!skipStory) this.push_story(!this.isdog_speak, this.text, false, "");
       this.text = "";
       this.scroll_down();
     },
@@ -306,7 +296,7 @@ export default {
       this.story.push([isdog, text, isimg, pg]);
     },
     upload_story: function() {
-      let vm = this
+      let vm = this;
       this.scroll_down();
       this.text = "上傳中...";
       this.send_text(true);
@@ -327,15 +317,16 @@ export default {
     },
     load_story: function() {
       var vm = this;
-      let posturl = `http://${process.env.HOST || "localhost"}:${process.env.PORT || 3000}`;
+      let posturl = `http://${process.env.HOST || "localhost"}:${process.env
+        .PORT || 3000}`;
       this.clean();
       this.text = "搜尋中．．．．";
       this.send_text();
       axios.get(posturl + "/api/get_stories").then(function(response) {
-            // console.log(response.data);
-            vm.clean();
-            story_mapping(response.data[0].message[0]);
-      })
+        // console.log(response.data);
+        vm.clean();
+        story_mapping(response.data[0].message[0]);
+      });
 
       function story_mapping(storys) {
         storys.forEach(function(item) {
