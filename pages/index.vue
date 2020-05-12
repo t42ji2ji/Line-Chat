@@ -40,6 +40,7 @@
           a.state_icon(style="background-image: url('/line.png'); filter: grayscale(0); margin-left:auto;margin-right:20px;" v-on:click="open_sticker" target="_blank" href="https://store.line.me/stickershop/product/7662172/zh-Hant")
 
         .inp
+          
           input.inputclass(v-model="text" :placeholder = "placeholder")
           input.send(type="submit" value="SEND" v-on:click="send_text")
     .hh
@@ -160,7 +161,7 @@ export default {
         } else if (event.keyCode == 39 && this.isopen_sticker) {
           this.stick_slide_btn(true);
         } else if (event.keyCode == 13) {
-          // this.send_text();
+          this.send_text();
         }
       });
     },
@@ -379,6 +380,7 @@ $dark-blue: #263147
   align-items: center
   text-align: center
   flex-direction: column
+  background-color: #dfffff
 
 .line-window
   position: relative
@@ -412,7 +414,7 @@ $dark-blue: #263147
     flex-direction: row
     justify-content: space-around
     align-items: center
-    
+
 
     .op_item
       flex: 1
@@ -488,12 +490,12 @@ $dark-blue: #263147
       width: 40px
       height: 50px
       transition: .4s
- 
+
     .state_hover
       &:hover
         filter: grayscale(0%)
         transform: scale(1.4)
-    
+
     .gap
       margin-left: 20px
       width: 3px
@@ -530,7 +532,7 @@ $dark-blue: #263147
       width: 20%
       background-color: $dark-blue
       cursor: pointer
-        
+
 .stickers_wraper
   height: 150px
   width: 100%
@@ -560,7 +562,7 @@ $dark-blue: #263147
         margin: 6px
 
 
-  
+
   .dots
     display: flex
     justify-content: center
@@ -651,7 +653,7 @@ $dark-blue: #263147
 //     transform: translateY(-6px) rotate(-1.2deg)
 .scale-enter-active, .scale-leave-active
   transition: .3s
-.scale-enter, .scale-leave-to /* .fade-leave-active below version 2.1.8 */ 
+.scale-enter, .scale-leave-to /* .fade-leave-active below version 2.1.8 */
   height: 0
 
 
@@ -712,14 +714,14 @@ $dark-blue: #263147
 
 
 .arrow_wrapper
-  opacity: 0 
+  opacity: 0
   transform: translateY(15px)
   transition: .5s
 
 .right
   transform: rotate(-45deg)
   -webkit-transform: rotate(-45deg)
-  
+
 
 .left
   transform: rotate(135deg)
@@ -741,7 +743,7 @@ $dark-blue: #263147
     display: none
 
   .slider
-    overflow-y: scroll    
+    overflow-y: scroll
     -webkit-overflow-scrolling: touch
 
 
