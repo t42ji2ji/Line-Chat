@@ -104,7 +104,7 @@ export default {
   },
   mounted() {
     this.getip();
-    console.log("qweqwe", process.env.HOST);
+    console.log("qweqwe", process.env);
     this.$el.querySelectorAll(".state_icon")[1].style.filter = "grayscale(0%)";
     let dot = this.$el.querySelector(".dot");
     dot.style.backgroundColor = "#263147";
